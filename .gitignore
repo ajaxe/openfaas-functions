@@ -1,0 +1,5 @@
+template
+build
+
+!template/node-mkdocs/Dockerfile
+!template/node-mkdocs/README.md

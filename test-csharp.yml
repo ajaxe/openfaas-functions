@@ -1,0 +1,8 @@
+provider:
+  name: faas
+  gateway: https://faas.apogee-dev.com
+functions:
+  test-csharp:
+    lang: csharp
+    handler: ./test-csharp
+    image: docker-registry.apogee-dev.com/test-csharp:latest
