@@ -1,5 +1,5 @@
-template
-build
+template/*
+build/*
 node_modules
 .vscode
 
