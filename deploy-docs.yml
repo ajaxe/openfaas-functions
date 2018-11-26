@@ -1,0 +1,8 @@
+provider:
+  name: faas
+  gateway: https://faas.apogee-dev.com
+functions:
+  deploy-docs:
+    lang: node-mkdocs
+    handler: ./deploy-docs
+    image: docker-registry.apogee-dev.com/deploy-docs:latest

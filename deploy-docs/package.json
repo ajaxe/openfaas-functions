@@ -1,0 +1,18 @@
+{
+  "name": "deploy-docs",
+  "version": "1.0.0",
+  "description": "deploy journal docs to AWS S3 on github commit",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "dependencies": {
+    "aws-sdk": "^2.361.0",
+    "mime-types": "^2.1.21",
+    "uuid": "^3.3.2"
+  }
+}
