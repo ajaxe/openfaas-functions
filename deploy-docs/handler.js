@@ -21,20 +21,16 @@ const RobotsTxt = "robots.txt";
 module.exports = async (context, callback) => {
     let workDir = process.env.LOCAL_REPO;
 
-    console.info("Getting latest documentation");
-    startTimer();
-    let result = await prepareWorkspace(workDir);
-    endTimer();
-    if (result.stderr) {
-        callback(result.stderr, null);
+    let validation = validateRequest(context);
+    if(validation) {
+        callback(null, validation);
+        return;
     }
-    console.info("Build MkDocs");
-    startTimer();
-    result = await buildDocs(workDir);
-    endTimer();
-    if (result.stderr) {
-        callback(result.stderr, null);
-    }
+
+    await prepareWorkspace(workDir);
+
+    await buildDocs(workDir);
+
     console.info("Clearing S3 bucket");
     startTimer();
     await clearS3Bucket();
@@ -55,6 +51,36 @@ const endTimer = function() {
     diffTime = process.hrtime(startTime);
     console.info(`Duration: ${(diffTime[0] * NS_PER_SEC + diffTime[1]) / MSEC_PER_SEC} msec`);
 };
+
+const displayOutput = function(stdout, stderr) {
+    if(stdout) {
+        console.log(`STDOUT: ${stdout}`);
+    }
+    if(stderr) {
+        console.log(`STDERR: ${stderr}`);
+    }
+}
+
+const validateRequest = function(context) {
+    if(!context) {
+        return {
+            message: "Invalid request context"
+        };
+    }
+    let githubEvent = process.env.Http_X_Github_Event;
+    if(githubEvent !== "push") {
+        return {
+            message: "Invalid github event type"
+        };
+    }
+    let ctx = JSON.parse(context);
+    if(ctx.ref !== "refs/heads/master") {
+        return {
+            message: "Not a master branch event"
+        };
+    }
+    return null;
+}
 
 const copyFiles = function(rootdir, subdir) {
     let copyPromises = [];
@@ -82,17 +108,23 @@ const copyFiles = function(rootdir, subdir) {
 };
 
 const prepareWorkspace = async function(workDir) {
+    console.info("Getting latest documentation");
+    startTimer();
     const { stdout, stderr } = await exec('git clean -fdX && git pull', {
         cwd: workDir
     });
-    return { stdout, stderr };
+    endTimer();
+    displayOutput(stdout, stderr);
 };
 
 const buildDocs = async function (workDir) {
+    console.info("Build MkDocs");
+    startTimer();
     const { stdout, stderr } = await exec('mkdocs build', {
         cwd: workDir
     });
-    return { stdout, stderr };
+    endTimer();
+    displayOutput(stdout, stderr);
 };
 
 const clearS3Bucket = async function () {
