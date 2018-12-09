@@ -1,0 +1,8 @@
+provider:
+  name: faas
+  gateway: https://faas.apogee-dev.com
+functions:
+  test-db-connection:
+    lang: csharp
+    handler: ./test-db-connection
+    image: docker-registry.apogee-dev.com/test-db-connection:latest

@@ -1,8 +1,14 @@
 template/*
 build/*
 node_modules
-.vscode
+bin/
+obj/
+.vs/
+.nuget/
+.dotnet/
+.templateengine/
 
+secrets/
 aws_credentials
 
 !template/node-mkdocs/Dockerfile
