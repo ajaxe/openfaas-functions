@@ -3,6 +3,7 @@ build/*
 node_modules
 bin/
 obj/
+.vscode/
 .vs/
 .nuget/
 .dotnet/

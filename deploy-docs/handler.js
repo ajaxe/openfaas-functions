@@ -7,6 +7,8 @@ const fs = require("fs");
 const path = require("path");
 const mime = require('mime-types');
 const AWS = require("aws-sdk");
+const HmacValidator = require("./hmacValidator");
+const SharedSecret = require("./secrets/sharedSecret");
 const credsFile = `${__dirname}/aws_credentials`;
 
 const awsCreds = new AWS.SharedIniFileCredentials({
@@ -68,6 +70,11 @@ const validateRequest = function(context) {
         };
     }
     let githubEvent = process.env.Http_X_Github_Event;
+    if(!validateHmac(context, signature)) {
+        return {
+            message: "Invalid signature";
+        };
+    }
     if(githubEvent !== "push") {
         return {
             message: "Invalid github event type"
@@ -81,6 +88,12 @@ const validateRequest = function(context) {
     }
     return null;
 }
+
+const validateHmac = function(payload) {
+    let signature = process.env.Http_X_Hub_Signature;
+    let validator = new HmacValidator(SharedSecret);
+    return validator.validate(payload, signature);
+};
 
 const copyFiles = function(rootdir, subdir) {
     let copyPromises = [];
