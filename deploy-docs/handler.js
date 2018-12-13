@@ -72,7 +72,7 @@ const validateRequest = function(context) {
     let githubEvent = process.env.Http_X_Github_Event;
     if(!validateHmac(context, signature)) {
         return {
-            message: "Invalid signature";
+            message: "Invalid signature"
         };
     }
     if(githubEvent !== "push") {
@@ -81,6 +81,7 @@ const validateRequest = function(context) {
         };
     }
     let ctx = JSON.parse(context);
+
     if(ctx.ref !== "refs/heads/master") {
         return {
             message: "Not a master branch event"
