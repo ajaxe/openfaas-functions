@@ -8,7 +8,7 @@ const getStdin = require('get-stdin');
 const handler = require('./function/handler');
 
 getStdin().then(val => {
-    handler(val, (err, res) => {
+    return handler(val, (err, res) => {
         if (err) {
             return console.error(err);
         }
@@ -26,6 +26,9 @@ getStdin().then(val => {
 }).catch(e => {
     console.error(e.stack);
     process.exit(1);
+})
+.then(function(){
+    process.exit();
 });
 
 const isArray = (a) => {

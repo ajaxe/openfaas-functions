@@ -2,18 +2,16 @@
 const process = require("process");
 const crypto = require("crypto");
 const SharedSecret = require("./secrets/sharedSecret");
+const BasicAuthValidator = require("./authentication/basicAuthValidator");
 
-module.exports = (context, callback) => {
-  validateCaller(process.env.Http_Path);
-  let values = {};
-  Object.keys(process.env).forEach(function (key) {
-    if (key.startsWith("Http_")) {
-      values[key] = process.env[key];
-    }
-  });
+module.exports = async (context, callback) => {
+  let auth = new BasicAuthValidator();
+  let valid = await auth.validate(process.env.Http_Authorization)
+  if(!valid) {
+    throw "Not authorized";
+  }
   if (callback) {
-    console.error(JSON.stringify(values));
-    callback(undefined, { status: "done" });
+    callback(undefined, { status: "ok" });
   }
 }
 
