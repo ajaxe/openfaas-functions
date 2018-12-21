@@ -3,9 +3,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 "use strict"
-
+const process = require("process");
 const getStdin = require('get-stdin');
-
 const handler = require('./function/handler');
 
 getStdin().then(val => {
@@ -26,6 +25,7 @@ getStdin().then(val => {
     });
 }).catch(e => {
     console.error(e.stack);
+    process.exit(1);
 });
 
 const isArray = (a) => {
