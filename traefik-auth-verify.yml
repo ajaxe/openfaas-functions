@@ -1,0 +1,11 @@
+provider:
+  name: faas
+  gateway: https://faas.apogee-dev.com
+functions:
+  traefik-auth-verify:
+    lang: node10
+    handler: ./traefik-auth-verify
+    image: docker-registry.apogee-dev.com/traefik-auth-verify:latest
+    environment:
+      combine_output: false
+      write_debug: true
