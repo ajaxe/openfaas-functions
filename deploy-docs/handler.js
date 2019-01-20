@@ -70,7 +70,7 @@ const validateRequest = function(context) {
         };
     }
     let githubEvent = process.env.Http_X_Github_Event;
-    if(!validateHmac(context, signature)) {
+    if(!validateHmac(context)) {
         return {
             message: "Invalid signature"
         };

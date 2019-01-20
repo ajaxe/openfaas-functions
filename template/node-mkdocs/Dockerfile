@@ -15,12 +15,13 @@ RUN apk --no-cache add curl \
         ca-certificates \
         bash \
         git \
-        python2 \
+        python3 \
         py-setuptools; \
-    easy_install-2.7 pip \
+    easy_install-3.6 pip \
     && pip install mkdocs==${MKDOCS_VERSION} \
         pymdown-extensions \
         mkdocs-material \
+    && pip install mkdocs-git-revision-date-plugin \
     && apk del --no-cache curl \
     && rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/*
 
