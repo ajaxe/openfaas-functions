@@ -1,5 +1,6 @@
 "use strict"
 
+const crypto = require("crypto");
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const process = require("process");
@@ -17,6 +18,8 @@ const awsCreds = new AWS.SharedIniFileCredentials({
 const s3Client = new AWS.S3({
     credentials: awsCreds
 });
+
+const rf = util.promisify(fs.readFile);
 const DocsBucketName = "apogee-dev.com";
 const RobotsTxt = "robots.txt";
 
@@ -24,7 +27,7 @@ module.exports = async (context, callback) => {
     let workDir = process.env.LOCAL_REPO;
 
     let validation = validateRequest(context);
-    if(validation) {
+    if (validation) {
         callback(null, validation);
         return;
     }
@@ -33,56 +36,58 @@ module.exports = async (context, callback) => {
 
     await buildDocs(workDir);
 
-    console.info("Clearing S3 bucket");
-    startTimer();
-    await clearS3Bucket();
-    endTimer();
-
     console.info("Copying files to S3");
     startTimer();
     await Promise.all(copyFiles(`${workDir}/site`));
     endTimer();
 };
 let startTime, diffTime;
-const startTimer = function() {
+const startTimer = function () {
     startTime = process.hrtime();
 };
-const endTimer = function() {
+const endTimer = function () {
     const NS_PER_SEC = 1e9;
     const MSEC_PER_SEC = 1e6;
     diffTime = process.hrtime(startTime);
     console.info(`Duration: ${(diffTime[0] * NS_PER_SEC + diffTime[1]) / MSEC_PER_SEC} msec`);
 };
 
-const displayOutput = function(stdout, stderr) {
-    if(stdout) {
+const displayOutput = function (stdout, stderr) {
+    if (stdout) {
         console.log(`STDOUT: ${stdout}`);
     }
-    if(stderr) {
+    if (stderr) {
         console.log(`STDERR: ${stderr}`);
     }
 }
 
-const validateRequest = function(context) {
-    if(!context) {
+/**
+ * validate git webhook event request
+ * @param {object} context
+ */
+const validateRequest = function (context) {
+    if(process.env.SKIP_VALIDATION) {
+        return null;
+    }
+    if (!context) {
         return {
             message: "Invalid request context"
         };
     }
     let githubEvent = process.env.Http_X_Github_Event;
-    if(!validateHmac(context)) {
+    if (!validateHmac(context)) {
         return {
             message: "Invalid signature"
         };
     }
-    if(githubEvent !== "push") {
+    if (githubEvent !== "push") {
         return {
             message: "Invalid github event type"
         };
     }
     let ctx = JSON.parse(context);
 
-    if(ctx.ref !== "refs/heads/master") {
+    if (ctx.ref !== "refs/heads/master") {
         return {
             message: "Not a master branch event"
         };
@@ -90,38 +95,52 @@ const validateRequest = function(context) {
     return null;
 }
 
-const validateHmac = function(payload) {
+const validateHmac = function (payload) {
     let signature = process.env.Http_X_Hub_Signature;
     let validator = new HmacValidator(SharedSecret);
     return validator.validate(payload, signature);
 };
 
-const copyFiles = function(rootdir, subdir) {
+const copyFiles = function (rootdir, subdir) {
     let copyPromises = [];
     const isSubdir = subdir ? true : false;
     const abspath = subdir ? path.join(rootdir, subdir) : rootdir;
     fs.readdirSync(abspath).forEach((filename) => {
         let filepath = path.join(abspath, filename);
-        if(fs.statSync(filepath).isDirectory()) {
+        if (fs.statSync(filepath).isDirectory()) {
             let p = copyFiles(rootdir, path.join(subdir || '', filename || ''));
             Array.prototype.push.apply(copyPromises, p);
         }
         else {
-            let rf = util.promisify(fs.readFile);
             rf(filepath).then((filecontent) => {
-                copyPromises.push(s3Client.putObject({
-                    Bucket: DocsBucketName,
-                    Key: isSubdir ? `${subdir}/${filename}` : filename,
-                    Body: filecontent,
-                    ContentType: mime.lookup(filepath)
-                }).promise());
+                let s3key = isSubdir ? `${subdir}/${filename}` : filename
+
+                let outerPromise = isS3ObjectChanged(s3key, filecontent)
+                .then(function(changed) {
+                    let p = Promise.resolve();
+                    if (changed) {
+                        console.log('uploading key: ' + s3key);
+                        p = s3Client.putObject({
+                            Bucket: DocsBucketName,
+                            Key: s3key,
+                            Body: filecontent,
+                            ContentType: mime.lookup(filepath)
+                        }).promise();
+                    }
+                    return p;
+                });
+
+                copyPromises.push(outerPromise);
             });
         }
     });
     return copyPromises;
 };
 
-const prepareWorkspace = async function(workDir) {
+/**
+ * git clean and download latest documentation
+ */
+const prepareWorkspace = async function (workDir) {
     console.info("Getting latest documentation");
     startTimer();
     const { stdout, stderr } = await exec('git clean -fdX && git pull', {
@@ -131,6 +150,10 @@ const prepareWorkspace = async function(workDir) {
     displayOutput(stdout, stderr);
 };
 
+/**
+ * Build mkdocs site
+ * @param {string} workDir git repo folder path where mkdocs files are checked out.
+ */
 const buildDocs = async function (workDir) {
     console.info("Build MkDocs");
     startTimer();
@@ -153,7 +176,7 @@ const clearS3Bucket = async function () {
         }
     });
 
-    if(keys.length === 0) {
+    if (keys.length === 0) {
         return;
     }
 
@@ -174,4 +197,36 @@ const clearS3Bucket = async function () {
         });
         throw JSON.stringify(errs);
     }
+};
+
+/**
+ * Compute etag for fileContent and check if the S3 object given by fileKey has changed.
+ * @param {string} fileKey
+ * @param {buffer} fileContent
+ */
+const isS3ObjectChanged = async function (fileKey, fileContent) {
+    let etag = generateMD5Hash(fileContent);
+    try {
+        let obj = await s3Client.getObject({
+            Bucket: DocsBucketName,
+            IfNoneMatch: etag,
+            Key: fileKey
+        }).promise();
+        if(obj.$response.data != null) {
+            console.log(`S3 fileKey: ${fileKey}, etag: ${obj.$response.data.ETag}, computed: ${etag}`);
+            return true;
+        }
+        return false;
+    }
+    catch (err) {
+        if(err.stack.startsWith('NotModified')) {
+            return false;
+        }
+        throw err;
+    }
+};
+
+const generateMD5Hash = function (fileData) {
+    let hasher = crypto.createHash('md5');
+    return hasher.update(fileData).digest('hex');
 };
