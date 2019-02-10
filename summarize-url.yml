@@ -1,0 +1,10 @@
+provider:
+  name: faas
+  gateway: https://faas.apogee-dev.com
+functions:
+  summarize-url:
+    lang: node
+    handler: ./summarize-url
+    image: docker-registry.apogee-dev.com/summarize-url:latest
+    environment:
+      content_type: application/json

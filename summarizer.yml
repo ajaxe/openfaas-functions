@@ -6,6 +6,8 @@ functions:
     lang: python-summarizer
     handler: ./summarizer
     image: docker-registry.apogee-dev.com/summarizer:latest
+    environment:
+      content_type: application/json
     labels:
       traefik.docker.network: functions
       traefik.enable: true
