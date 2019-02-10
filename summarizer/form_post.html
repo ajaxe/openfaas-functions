@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Form Post for Summarizer</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="container">
+        <form action="https://faas.apogee-dev.com/function/summarizer" method="POST">
+            <div class="form-group">
+                <label for="input-text" class="font-weight-bold">Enter text for Summary</label>
+                <textarea id="input-text" class="form-control" placeholder="Enter text for summary"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <div id="summary"></div>
+    </div>
+    <script type="text/javascript">
+    $(function(){
+        $('button[type="submit"]').click(function(e){
+            var url = $(this).parents('form:first').prop('action');
+            $.post(url, $('#input-text').val())
+            .then(function(data){
+                $('#summary').text(data);
+            })
+            .catch(function(){
+                alert('error calling api');
+            });
+            return false;
+        });
+    })
+    </script>
+</body>
+
+</html>

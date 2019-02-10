@@ -1,0 +1,14 @@
+provider:
+  name: faas
+  gateway: https://faas.apogee-dev.com
+functions:
+  summarizer:
+    lang: python-summarizer
+    handler: ./summarizer
+    image: docker-registry.apogee-dev.com/summarizer:latest
+    labels:
+      traefik.docker.network: functions
+      traefik.enable: true
+      traefik.domain: faas.apogee-dev.com
+      traefik.frontend.rule: "Host:faas.apogee-dev.com;PathPrefix:/function/summarizer"
+      traefik.frontend.headers.customResponseHeaders: "Access-Control-Allow-Origin:*"
