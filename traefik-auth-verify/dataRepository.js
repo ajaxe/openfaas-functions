@@ -1,6 +1,6 @@
-const mariadb = require('mariadb');
-const DbConfig = require('./secrets/dbConfig');
-const pool = mariadb.createPool(DbConfig);
+const mariadb = require('mariadb')
+const DbConfig = require('./secrets/dbConfig')
+const pool = mariadb.createPool(DbConfig)
 
 class DataRepository {
 /**
@@ -14,29 +14,27 @@ class DataRepository {
    * @param {string} keyId
    * @returns {UserSecret}
    */
-  async getCredentialById(keyId) {
-    let conn;
+  async getCredentialById (keyId) {
+    let conn
     try {
-      conn = await pool.getConnection();
-      let rows = await conn.query("SELECT username, userSecret FROM ApiCredentials WHERE Username = ?", [keyId]);
-      if(rows && rows.length > 0) {
-        return rows[0];
+      conn = await pool.getConnection()
+      let rows = await conn.query('SELECT username, userSecret FROM ApiCredentials WHERE Username = ?', [keyId])
+      if (rows && rows.length > 0) {
+        return rows[0]
       }
-      return null;
-    }
-    catch(err) {
-      throw err;
-    }
-    finally {
-      if(conn) {
-        conn.end();
+      return null
+    } catch (err) {
+      throw err
+    } finally {
+      if (conn) {
+        conn.end()
       }
     }
   }
-  static disposePool() {
-    if(pool) {
-      pool.end();
+  static disposePool () {
+    if (pool) {
+      pool.end()
     }
   }
 }
-module.exports = DataRepository;
+module.exports = DataRepository

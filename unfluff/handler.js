@@ -10,7 +10,10 @@ module.exports = async (context, callback) => {
       throw new Error('invalid url')
     }
     let link = new url.URL(context)
-    let htmlFetch = link.protocol.toLowerCase() === 'https:' ? https.get : http.get
+    let htmlFetch = https.get
+    if (link.protocol) {
+      htmlFetch = link.protocol.toLowerCase() === 'https:' ? https.get : http.get
+    }
     htmlFetch(link.href, function (res) {
       const { statusCode } = res
       if (statusCode !== 200) {
@@ -23,6 +26,13 @@ module.exports = async (context, callback) => {
       res.on('end', () => {
         try {
           const extData = extractor(rawData)
+          delete extData.softTitle
+          delete extData.image
+          delete extData.tags
+          delete extData.links
+          delete extData.videos
+          delete extData.canonicalLink
+          delete extData.lang
           callback(undefined, extData)
         } catch (e) {
           callback(e.stack, null)
