@@ -11,4 +11,4 @@ functions:
       traefik.enable: true
       traefik.domain: faas.apogee-dev.com
       traefik.frontend.rule: "Host:faas.apogee-dev.com;PathPrefix:/function/test-db-connection"
-      traefik.testdbconn.frontend.auth.forward.address: "https://faas.apogee-dev.com/function/traefik-auth-verify"
+      traefik.testdbconn.frontend.auth.forward.address: "https://offsite.apogee-dev.com/hostmgmt/api/authentication/verify"
