@@ -3,7 +3,7 @@ provider:
   gateway: https://faas.apogee-dev.com
 functions:
   unfluff:
-    lang: node
+    lang: node10
     handler: ./unfluff
     image: docker-registry.apogee-dev.com/unfluff:latest
     environment:
