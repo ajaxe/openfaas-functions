@@ -1,0 +1,8 @@
+provider:
+  name: faas
+  gateway: https://faas.apogee-dev.com
+functions:
+  generate-crypto-key-512:
+    lang: csharp
+    handler: ./generate-crypto-key-512
+    image: docker-registry.apogee-dev.com/generate-crypto-key-512:latest
