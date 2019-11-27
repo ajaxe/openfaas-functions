@@ -1,0 +1,44 @@
+provider:
+  name: faas
+  gateway: https://faas.apogee-dev.com
+functions:
+  unfluff:
+    lang: node10
+    handler: ./unfluff
+    image: docker-registry.apogee-dev.com/unfluff:latest
+    environment:
+      content_type: application/json
+  deploy-docs:
+    lang: node-mkdocs
+    handler: ./deploy-docs
+    image: docker-registry.apogee-dev.com/deploy-docs:latest
+  enerate-crypto-key-512:
+    lang: csharp
+    handler: ./generate-crypto-key-512
+    image: docker-registry.apogee-dev.com/generate-crypto-key-512:latest
+  summarizer:
+    lang: python-summarizer
+    handler: ./summarizer
+    image: docker-registry.apogee-dev.com/summarizer:latest
+    environment:
+      content_type: application/json
+  unfluff:
+    lang: node10
+    handler: ./unfluff
+    image: docker-registry.apogee-dev.com/unfluff:latest
+    environment:
+      content_type: application/json
+  summarize-url:
+    lang: node
+    handler: ./summarize-url
+    image: docker-registry.apogee-dev.com/summarize-url:latest
+    environment:
+      content_type: application/json
+  test-csharp:
+    lang: csharp
+    handler: ./test-csharp
+    image: docker-registry.apogee-dev.com/test-csharp:latest
+  test-db-connection:
+    lang: csharp
+    handler: ./test-db-connection
+    image: docker-registry.apogee-dev.com/test-db-connection:latest
