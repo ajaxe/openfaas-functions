@@ -2,6 +2,28 @@ provider:
   name: faas
   gateway: https://faas.apogee-dev.com
 functions:
+  summarizer:
+    lang: python-summarizer
+    handler: ./summarizer
+    image: docker-registry.apogee-dev.com/summarizer:latest
+    environment:
+      content_type: application/json
+    labels:
+      traefik.docker.network: functions
+      traefik.enable: true
+      traefik.http.routers.faas-summarizer.rule: Host(`faas.apogee-dev.com`) && PathPrefix(`/function/summarizer`)
+      traefik.http.routers.faas-summarizer.entrypoints: http,https
+      traefik.http.routers.faas-summarizer.middlewares: ACAO-all
+
+      traefik.http.routers.faas-summarizer.service: open-faas@docker
+
+      traefik.http.middlewares.ACAO-all.headers.customResponseHeaders.Access-Control-Allow-Origin: "*"
+  unfluff:
+    lang: node10
+    handler: ./unfluff
+    image: docker-registry.apogee-dev.com/unfluff:latest
+    environment:
+      content_type: application/json
   summarize-url:
     lang: node
     handler: ./summarize-url
