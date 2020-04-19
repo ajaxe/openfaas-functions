@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-aws-sdk@^2.361.0:
-  version "2.614.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.614.0.tgz#e954824c1b9e566691a24ed8491ebf1d68350d37"
-  integrity sha512-o7utaxDMo9ri1VyPKw8Kcmpy5uZOqMeok2cgur70iZ94zsLIRnHKrBv1wMBbyRGuUbfJRq76HGAS9QxdiSqQHw==
+aws-sdk@^2.658.0:
+  version "2.658.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.658.0.tgz#dd0b1225d2b42eebdf9c4347a9568f317c0b90b1"
+  integrity sha512-vb+CorOG2lod4ZztrVaE3hcSjTwnB9HhTOnD/2R9YJtIUGTJqL0CIDTwo0Q384GFROtDhp7j6SX7oKFwdzDEuA==
   dependencies:
     buffer "4.9.1"
     events "1.1.1"
@@ -96,10 +96,10 @@ uuid@3.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
   integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
 
-uuid@^3.3.2:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
-  integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
+uuid@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.3.tgz#c5c9f2c8cf25dc0a372c4df1441c41f5bd0c680b"
+  integrity sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==
 
 xml2js@0.4.19:
   version "0.4.19"

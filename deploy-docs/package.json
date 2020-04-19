@@ -11,8 +11,8 @@
   "license": "ISC",
   "private": true,
   "dependencies": {
-    "aws-sdk": "^2.361.0",
+    "aws-sdk": "^2.658.0",
     "mime-types": "^2.1.21",
-    "uuid": "^3.3.2"
+    "uuid": "^7.0.3"
   }
 }
