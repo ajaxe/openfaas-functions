@@ -1,0 +1,8 @@
+provider:
+  name: openfaas
+  gateway: https://faas.apogee-dev.com
+functions:
+  open-graph-scraper:
+    lang: node12
+    handler: ./open-graph-scraper
+    image: docker-registry.apogee-dev.com/open-graph-scraper:latest

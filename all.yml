@@ -1,5 +1,5 @@
 provider:
-  name: faas
+  name: openfaas
   gateway: https://faas.apogee-dev.com
 functions:
   unfluff:
@@ -12,7 +12,7 @@ functions:
     lang: node-mkdocs
     handler: ./deploy-docs
     image: docker-registry.apogee-dev.com/deploy-docs:latest
-  enerate-crypto-key-512:
+  generate-crypto-key-512:
     lang: csharp
     handler: ./generate-crypto-key-512
     image: docker-registry.apogee-dev.com/generate-crypto-key-512:latest
@@ -34,11 +34,12 @@ functions:
     image: docker-registry.apogee-dev.com/summarize-url:latest
     environment:
       content_type: application/json
-  test-csharp:
-    lang: csharp
-    handler: ./test-csharp
-    image: docker-registry.apogee-dev.com/test-csharp:latest
   test-db-connection:
     lang: csharp
     handler: ./test-db-connection
     image: docker-registry.apogee-dev.com/test-db-connection:latest
+  open-graph-scraper:
+    lang: node12
+    handler: ./open-graph-scraper
+    image: docker-registry.apogee-dev.com/open-graph-scraper:latest
+
