@@ -11,6 +11,6 @@
   "license": "ISC",
   "private": true,
   "dependencies": {
-    "mariadb": "^2.3.1"
+    "mariadb": "^2.5.0"
   }
 }
